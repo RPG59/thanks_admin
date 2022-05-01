@@ -5,17 +5,37 @@ import { writable } from "svelte/store";
   let partnersList = writable([]);
 
 
-  onMount(() => {
-    fetch(`${API_BASE_URL}/api/partners`).then(x => x.json()).then(list => {
+  onMount(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/partners`);
+      const list = await response.json();
+      console.log(list);
+
       partnersList.set(list);
-    })
+    } catch(error) {
+      console.log(error);
+    }
   })
 </script>
 
 <main>
-  <ul>
-    {#each $partnersList as partner}
-      <li>{partner.title}</li>
-    {/each}
-  </ul>
+    {#if $partnersList.length}
+      <table>
+        <tr>
+          {#each Object.keys($partnersList[0]) as keys}
+          <th>{keys}</th>
+          {/each}
+        </tr>
+        {#each $partnersList as partner}
+          <tr>
+            {#each Object.values(partner) as value}
+              <td>{value}</td>
+            {/each}
+              <td>
+                <button>delete</button>
+              </td>
+          </tr>
+        {/each}
+      </table>
+    {/if}
 </main>
