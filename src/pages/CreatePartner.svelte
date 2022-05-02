@@ -10,6 +10,7 @@ import { writable } from "svelte/store";
   let logo = '';
   let discount = '';
   let showSuccessBanner = writable(false);
+  let image = null;
   let _timerDescriptor = null;
 
   onDestroy(() => {
@@ -28,17 +29,31 @@ import { writable } from "svelte/store";
   }
   
   const onSubmit = () => {
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("discount", discount);
+    formData.append("logo", image.files[0]);
+
+    console.log(formData.keys());
+
+
     fetch(`${API_BASE_URL}/api/create-partner`, {
       method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          discount,
-          logo
-        })
+      // headers: {
+      //   'Content-Type': 'multipart/form-data'
+      // },
+      body: formData
+        // headers: {
+        //   'Content-Type': 'application/json'
+        // },
+        // body: JSON.stringify({
+        //   title,
+        //   description,
+        //   discount,
+        //   logo
+        // })
     }).then(res => {
       if(res.ok) {
         showSuccessBanner.set(true);
@@ -59,6 +74,7 @@ import { writable } from "svelte/store";
   <input required placeholder="discount" type="text" bind:value={discount}>
   <input required placeholder="logo" type="text" bind:value={logo}>
   <input placeholder="description" type="text" bind:value={description}>
+  <input type="file" placeholder="image" accept="image/*" bind:this={image}>
   <button type="submit">Submit</button>
 </form>
 {#if $showSuccessBanner}
